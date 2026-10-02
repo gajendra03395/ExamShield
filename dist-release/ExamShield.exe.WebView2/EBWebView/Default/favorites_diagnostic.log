@@ -1,0 +1,10 @@
+2026-10-02 11:56:13.075: [INFO] CurrentProfilePath: D:\ExamShield\dist-release\ExamShield.exe.WebView2\EBWebView\Default
+2026-10-02 11:56:13.075: [INFO] Profiles total count: 1
+2026-10-02 11:56:13.075: [INFO] Profile: name=Profile 1 path=D:\ExamShield\dist-release\ExamShield.exe.WebView2\EBWebView\Default lastActive=2026-10-02T11:55:47.312Z
+2026-10-02 11:56:13.075: [INFO] LastUsedProfileDir: D:\ExamShield\dist-release\ExamShield.exe.WebView2\EBWebView\Default
+2026-10-02 11:56:13.075: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=D:\ExamShield\dist-release\ExamShield.exe.WebView2\EBWebView\Default lastActive=2026-10-02T11:55:47.312Z
+2026-10-02 11:56:13.075: [INFO] OnDoneLoading sync enabled: 0
+2026-10-02 11:56:13.075: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-10-02 11:56:13.075: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-10-02 11:56:13.075: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-10-02 11:56:30.880: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
