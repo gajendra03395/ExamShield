@@ -30,4 +30,8 @@ logs/
 .vscode/
 .DS_Store
 Thumbs.db
-# Local agent/editor skill metadata`n**/.agents/`n**/.claude/`n**/.cursor/`n**/.devin/
+# Local agent/editor skill metadata
+**/.agents/
+**/.claude/
+**/.cursor/
+**/.devin/
