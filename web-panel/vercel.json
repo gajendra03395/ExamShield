@@ -4,6 +4,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://examshield-d1l1.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
