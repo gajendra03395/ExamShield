@@ -1,0 +1,13 @@
+.git
+.codex
+.agents
+**/node_modules
+**/bin
+**/obj
+**/build-check
+**/dist
+**/logs
+**/.env
+**/.env.*
+**/*.user
+**/*.suo

@@ -1,0 +1,325 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum QuestionType {
+  MCQ
+  MULTI_SELECT
+  TRUE_FALSE
+  CODE_WRITING
+  CODE_COMPLETION
+  ERROR_FINDING
+  PROBLEM_IDENTIFICATION
+  SHORT_ANSWER
+}
+
+enum DifficultyLevel {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ProgrammingLanguage {
+  JAVA
+  CPP
+  PYTHON
+  C
+  NONE
+}
+
+enum TestStatus {
+  DRAFT
+  PUBLISHED
+  LIVE
+  COMPLETED
+  RESULTS_PUBLISHED
+}
+
+enum EvaluationStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum ViolationType {
+  WINDOW_SWITCH
+  ALT_TAB
+  TASK_MANAGER
+  PRINT_SCREEN
+  SCREEN_MINIMIZE
+  USB_DEVICE
+  PROCESS_LAUNCH
+  NETWORK_DISCONNECT
+  VM_DETECTED
+  CLIPBOARD_ACCESS
+  RIGHT_CLICK
+  KEYBOARD_SHORTCUT
+  MULTI_MONITOR
+  SCREEN_SHARE
+  UNKNOWN
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("admins")
+}
+
+model Faculty {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  department   String?
+  subject      String?
+  isActive     Boolean       @default(true) @map("is_active")
+  approvedBy   String?       @map("approved_by")
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  questions    Question[]
+  tests        Test[]
+  gradedTests  StudentTest[] @relation("GradedBy")
+
+  @@map("faculties")
+}
+
+model Student {
+  id           String        @id @default(uuid())
+  name         String
+  enrollmentNo String        @unique @map("enrollment_no")
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  batch        String
+  division     String
+  isActive     Boolean       @default(true) @map("is_active")
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  studentTests StudentTest[]
+  violations   Violation[]
+
+  @@map("students")
+}
+
+model Question {
+  id               String              @id @default(uuid())
+  facultyId        String              @map("faculty_id")
+  questionType     QuestionType        @map("question_type")
+  difficulty       DifficultyLevel     @default(MEDIUM)
+  language         ProgrammingLanguage @default(NONE)
+  subject          String
+  topic            String?
+  questionText     String              @map("question_text")
+  questionImageUrl String?             @map("question_image_url")
+  codeSnippet      String?             @map("code_snippet")
+  codeLanguage     String?             @map("code_language")
+  options          Json?
+  expectedOutput   String?             @map("expected_output")
+  testCases        Json?               @map("test_cases")
+  solutionCode     String?             @map("solution_code")
+  marks            Float               @default(1)
+  explanation      String?
+  tags             String[]
+  isActive         Boolean             @default(true) @map("is_active")
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  faculty          Faculty             @relation(fields: [facultyId], references: [id])
+  sectionQuestions SectionQuestion[]
+  studentAnswers   StudentAnswer[]
+
+  @@map("question_bank")
+}
+
+model Test {
+  id                 String        @id @default(uuid())
+  facultyId          String        @map("faculty_id")
+  title              String
+  description        String?
+  subject            String
+  startTime          DateTime      @map("start_time")
+  endTime            DateTime      @map("end_time")
+  durationMinutes    Int           @map("duration_minutes")
+  totalMarks         Float         @map("total_marks")
+  passingMarks       Float?        @map("passing_marks")
+  shuffleQuestions   Boolean       @default(true) @map("shuffle_questions")
+  shuffleOptions     Boolean       @default(true) @map("shuffle_options")
+  showMarksPerQ      Boolean       @default(true) @map("show_marks_per_question")
+  allowReview        Boolean       @default(true) @map("allow_review")
+  autoSubmitOnTime   Boolean       @default(true) @map("auto_submit_on_time")
+  enableLockdown     Boolean       @default(true) @map("enable_lockdown")
+  maxViolations      Int           @default(3) @map("max_violations")
+  detectVm           Boolean       @default(true) @map("detect_vm")
+  detectUsb          Boolean       @default(true) @map("detect_usb")
+  blockProcesses     Boolean       @default(true) @map("block_processes")
+  targetBatches      String[]      @map("target_batches")
+  targetDivisions    String[]      @map("target_divisions")
+  status             TestStatus    @default(DRAFT)
+  resultsPublished   Boolean       @default(false) @map("results_published")
+  publishedAt        DateTime?     @map("results_published_at")
+  publishedBy        String?       @map("published_by")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  faculty            Faculty       @relation(fields: [facultyId], references: [id])
+  sections           TestSection[]
+  studentTests       StudentTest[]
+  violations         Violation[]
+
+  @@map("tests")
+}
+
+model TestSection {
+  id               String            @id @default(uuid())
+  testId           String            @map("test_id")
+  title            String
+  description      String?
+  sectionOrder     Int               @map("section_order")
+  marksPerQuestion Float?            @map("marks_per_question")
+  totalMarks       Float             @map("total_marks")
+  pickRandom       Boolean           @default(false) @map("pick_random")
+  randomCount      Int?              @map("random_count")
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  test             Test              @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questions        SectionQuestion[]
+  studentAnswers   StudentAnswer[]
+
+  @@map("test_sections")
+}
+
+model SectionQuestion {
+  id            String      @id @default(uuid())
+  sectionId     String      @map("section_id")
+  questionId    String      @map("question_id")
+  questionOrder Int?        @map("question_order")
+  marksOverride Float?      @map("marks_override")
+  isPool        Boolean     @default(false) @map("is_pool")
+
+  section       TestSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  question      Question    @relation(fields: [questionId], references: [id])
+
+  @@map("section_questions")
+}
+
+model StudentTest {
+  id                String          @id @default(uuid())
+  testId            String          @map("test_id")
+  studentId         String          @map("student_id")
+  assignedQuestions Json            @map("assigned_questions")
+  status            String          @default("NOT_STARTED")
+  startedAt         DateTime?       @map("started_at")
+  submittedAt       DateTime?       @map("submitted_at")
+  timeRemainingSec  Int?            @map("time_remaining_sec")
+  mcqScore          Float           @default(0) @map("mcq_score")
+  codeScore         Float           @default(0) @map("code_score")
+  totalScore        Float           @default(0) @map("total_score")
+  percentage        Float           @default(0)
+  evaluationStatus  EvaluationStatus @default(PENDING) @map("evaluation_status")
+  evaluatedAt       DateTime?       @map("evaluated_at")
+  facultyRemarks    String?         @map("faculty_remarks")
+  autoGradedScore   Float?          @map("auto_graded_score")
+  manualGradedScore Float?          @map("manual_graded_score")
+  isGraded          Boolean         @default(false) @map("is_graded")
+  gradedById        String?         @map("graded_by")
+  gradedAt          DateTime?       @map("graded_at")
+  violationCount    Int             @default(0) @map("violation_count")
+  submissionReason  String?         @map("submission_reason")
+  machineId         String?         @map("machine_id")
+  ipAddress         String?         @map("ip_address")
+  osVersion         String?         @map("os_version")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  test              Test            @relation(fields: [testId], references: [id])
+  student           Student         @relation(fields: [studentId], references: [id])
+  gradedByFaculty   Faculty?        @relation("GradedBy", fields: [gradedById], references: [id])
+  answers           StudentAnswer[]
+  violations        Violation[]
+
+  @@unique([testId, studentId])
+  @@map("student_tests")
+}
+
+model StudentAnswer {
+  id              String       @id @default(uuid())
+  studentTestId   String       @map("student_test_id")
+  questionId      String       @map("question_id")
+  sectionId       String?      @map("section_id")
+  selectedOptions Json?        @map("selected_options")
+  codeAnswer      String?      @map("code_answer")
+  textAnswer      String?      @map("text_answer")
+  isCorrect       Boolean?     @map("is_correct")
+  marksAwarded    Float?       @map("marks_awarded")
+  marksObtained   Float        @default(0) @map("marks_obtained")
+  isEvaluated     Boolean      @default(false) @map("is_evaluated")
+  evaluatorFeedback String?    @map("evaluator_feedback")
+  facultyComment  String?      @map("faculty_comment")
+  timeSpentSec    Int?         @map("time_spent_seconds")
+  isFlagged       Boolean      @default(false) @map("is_flagged")
+  answeredAt      DateTime     @default(now()) @map("answered_at")
+
+  studentTest     StudentTest  @relation(fields: [studentTestId], references: [id], onDelete: Cascade)
+  question        Question     @relation(fields: [questionId], references: [id])
+  section         TestSection? @relation(fields: [sectionId], references: [id])
+
+  @@unique([studentTestId, questionId])
+  @@map("student_answers")
+}
+
+model Violation {
+  id              String        @id @default(uuid())
+  clientEventId   String?       @unique @map("client_event_id")
+  studentTestId   String        @map("student_test_id")
+  studentId       String        @map("student_id")
+  testId          String        @map("test_id")
+  violationType   ViolationType @map("violation_type")
+  description     String?
+  keyCombination  String?       @map("key_combination")
+  processName     String?       @map("process_name")
+  screenshotUrl   String?       @map("screenshot_url")
+  violationNumber Int           @map("violation_number")
+  actionTaken     String?       @map("action_taken")
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  studentTest     StudentTest   @relation(fields: [studentTestId], references: [id], onDelete: Cascade)
+  student         Student       @relation(fields: [studentId], references: [id])
+  test            Test          @relation(fields: [testId], references: [id])
+
+  @@map("violations")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userType  String   @map("user_type")
+  userId    String   @map("user_id")
+  action    String
+  details   Json?
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("activity_logs")
+}
+
+model Batch {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("batches")
+}
+
+model Division {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("divisions")
+}
