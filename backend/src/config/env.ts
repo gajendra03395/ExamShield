@@ -16,7 +16,9 @@ export const ENV = {
 if (!ENV.DATABASE_URL) throw new Error("DATABASE_URL must be configured before starting ExamShield");
 if (ENV.JWT_SECRET.length < 32) throw new Error("JWT_SECRET must contain at least 32 characters");
 if (ENV.ADMIN_BOOTSTRAP_TOKEN && ENV.ADMIN_BOOTSTRAP_TOKEN.length < 32) throw new Error("ADMIN_BOOTSTRAP_TOKEN must contain at least 32 characters when enabled");
-if (!Number.isInteger(ENV.PORT) || ENV.PORT !== 5000) throw new Error("PORT must be set to 5000 for the ExamShield desktop client");
+if (!Number.isInteger(ENV.PORT) || ENV.PORT < 1 || ENV.PORT > 65535) {
+  throw new Error("PORT must be a valid port number");
+}
 if (ENV.NODE_ENV === "production" && ENV.JWT_SECRET.toLowerCase().includes("example")) {
   throw new Error("JWT_SECRET must be changed from its example value in production");
 }
