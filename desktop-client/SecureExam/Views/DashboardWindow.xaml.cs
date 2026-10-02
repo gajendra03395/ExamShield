@@ -71,7 +71,7 @@ namespace SecureExam.Views
             {
                 await ResultsWebView.EnsureCoreWebView2Async();
                 var token = Uri.EscapeDataString(ApiService.Token ?? string.Empty);
-                ResultsWebView.Source = new Uri($"http://127.0.0.1:5173/student/results?token={token}");
+                ResultsWebView.Source = new Uri($"{ApiService.WebBaseUrl}/student/results?token={token}");
             }
             catch (Exception ex)
             {

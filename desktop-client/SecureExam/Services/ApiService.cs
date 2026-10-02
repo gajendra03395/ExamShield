@@ -12,7 +12,9 @@ namespace SecureExam.Services
 {
     public static class ApiService
     {
-        private static readonly HttpClient client = new HttpClient { BaseAddress = new Uri("http://127.0.0.1:5000"), Timeout = TimeSpan.FromSeconds(8) };
+        public const string ApiBaseUrl = "https://examshield-d1l1.onrender.com";
+        public const string WebBaseUrl = "https://exam-shield-livid.vercel.app";
+        private static readonly HttpClient client = new HttpClient { BaseAddress = new Uri(ApiBaseUrl), Timeout = TimeSpan.FromSeconds(20) };
         private static readonly System.Threading.SemaphoreSlim healthCheckLock = new(1, 1);
 
         public static string? Token { get; set; }

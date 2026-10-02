@@ -19,7 +19,7 @@ namespace SecureExam.Views
             {
                 await WebView.EnsureCoreWebView2Async();
                 WebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
-                WebView.Source = new Uri($"http://127.0.0.1:5173/faculty?token={Uri.EscapeDataString(ApiService.Token ?? string.Empty)}");
+                WebView.Source = new Uri($"{ApiService.WebBaseUrl}/faculty?token={Uri.EscapeDataString(ApiService.Token ?? string.Empty)}");
             };
             Closed += (_, _) => { if (!loggingOut) System.Windows.Application.Current.Shutdown(); };
         }
@@ -37,7 +37,7 @@ namespace SecureExam.Views
             if (sender is System.Windows.Controls.Button { Tag: string path } && WebView.CoreWebView2 is not null)
             {
                 var separator = path.Contains('?') ? "&" : "?";
-                WebView.CoreWebView2.Navigate($"http://127.0.0.1:5173{path}{separator}token={Uri.EscapeDataString(ApiService.Token ?? string.Empty)}");
+                WebView.CoreWebView2.Navigate($"{ApiService.WebBaseUrl}{path}{separator}token={Uri.EscapeDataString(ApiService.Token ?? string.Empty)}");
             }
         }
 

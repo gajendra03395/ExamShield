@@ -49,7 +49,7 @@ namespace SecureExam.Views
             };
             healthTimer.Start();
 
-            socketClient = new SocketIO(new Uri("http://127.0.0.1:5000"), new SocketIOOptions
+            socketClient = new SocketIO(new Uri(ApiService.ApiBaseUrl), new SocketIOOptions
             {
                 Auth = new Dictionary<string, string> { ["token"] = ApiService.Token ?? string.Empty }
             });
@@ -77,7 +77,7 @@ namespace SecureExam.Views
             settings.AreHostObjectsAllowed = false;
             WebView.CoreWebView2.NavigationStarting += (_, eventArgs) =>
             {
-                if (!Uri.TryCreate(eventArgs.Uri, UriKind.Absolute, out var destination) || destination.Scheme != Uri.UriSchemeHttp || destination.Host != "127.0.0.1" || destination.Port != 5173)
+                if (!Uri.TryCreate(eventArgs.Uri, UriKind.Absolute, out var destination) || destination.Scheme != Uri.UriSchemeHttps || destination.Host != "exam-shield-livid.vercel.app")
                     eventArgs.Cancel = true;
             };
             WebView.CoreWebView2.NewWindowRequested += (_, eventArgs) => eventArgs.Handled = true;
@@ -86,7 +86,7 @@ namespace SecureExam.Views
                 if (eventArgs.TryGetWebMessageAsString() == "exam-submitted") Dispatcher.BeginInvoke(Close);
             };
 
-            string url = $"http://127.0.0.1:5173/exam/{Uri.EscapeDataString(studentTestId)}?token={Uri.EscapeDataString(ApiService.Token ?? string.Empty)}&embedded=1";
+            string url = $"{ApiService.WebBaseUrl}/exam/{Uri.EscapeDataString(studentTestId)}?token={Uri.EscapeDataString(ApiService.Token ?? string.Empty)}&embedded=1";
             WebView.Source = new Uri(url);
         }
 

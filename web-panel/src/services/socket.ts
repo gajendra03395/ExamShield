@@ -19,8 +19,9 @@ export function connectSocket(token: string) {
   const open = () => {
     if (closed) return;
     const socketProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const apiHost = window.location.hostname === "127.0.0.1" ? "127.0.0.1" : "localhost";
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || `${socketProtocol}//${apiHost}:5000/socket.io/?EIO=4&transport=websocket`;
+    const localSocket = `${socketProtocol}//127.0.0.1:5000/socket.io/?EIO=4&transport=websocket`;
+    const productionSocket = "wss://examshield-d1l1.onrender.com/socket.io/?EIO=4&transport=websocket";
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ? localSocket : productionSocket);
     socket = new WebSocket(socketUrl);
     socket.onmessage = ({ data }) => {
       if (typeof data !== "string") return;
